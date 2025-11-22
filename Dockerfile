@@ -27,6 +27,6 @@ COPY --from=build /app/build/libs/PublicApiProj-0.0.1-SNAPSHOT.jar app.jar
 # 포트 노출 (렌더가 자동으로 PORT 환경 변수 제공)
 EXPOSE 8080
 
-# 애플리케이션 실행
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-Dserver.port=${PORT:-8080}", "-jar", "app.jar"]
+# 애플리케이션 실행 (쉘 형태로 변경하여 환경 변수 사용)
+ENTRYPOINT ["sh", "-c", "java -Djava.security.egd=file:/dev/./urandom -Dserver.port=${PORT:-8080} -jar app.jar"]
 

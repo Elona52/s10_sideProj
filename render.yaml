@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: side-proj
+    runtime: docker
+    buildCommand: "./gradlew build"
+    startCommand: "java -jar build/libs/*.jar"

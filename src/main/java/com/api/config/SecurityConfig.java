@@ -60,10 +60,17 @@ public class SecurityConfig {
                         new org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository();
                     csrfTokenRepository.setHeaderName("X-CSRF-TOKEN");
                     csrf.csrfTokenRepository(csrfTokenRepository)
-                        // 일부 읽기 전용 API는 CSRF 예외
+                        // 읽기 전용 공개 API는 CSRF 예외
                         .ignoringRequestMatchers(
                             "/api/auction-info/**",
-                            "/api/favorites/check"
+                            "/api/favorites/check",
+                            "/api/discount-50",
+                            "/api/sido/**",
+                            "/api/search",
+                            "/api/all",
+                            "/api/new",
+                            "/api/today-closing",
+                            "/api/main-data"
                         );
                 })
                 // 인가 설정
@@ -138,12 +145,43 @@ public class SecurityConfig {
     public static class SessionAuthenticationFilter 
             extends org.springframework.web.filter.OncePerRequestFilter {
         
+        // 공개 API 경로 목록 (인증 불필요)
+        private static final String[] PUBLIC_API_PATHS = {
+            "/api/auction-info",
+            "/api/discount-50",
+            "/api/sido",
+            "/api/search",
+            "/api/favorites/check",
+            "/api/all",
+            "/api/new",
+            "/api/today-closing",
+            "/api/main-data"
+        };
+        
+        private boolean isPublicApi(String requestPath) {
+            if (requestPath == null) return false;
+            for (String publicPath : PUBLIC_API_PATHS) {
+                if (requestPath.startsWith(publicPath)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
         @Override
         protected void doFilterInternal(
                 jakarta.servlet.http.HttpServletRequest request,
                 jakarta.servlet.http.HttpServletResponse response,
                 jakarta.servlet.FilterChain filterChain)
                 throws jakarta.servlet.ServletException, java.io.IOException {
+            
+            String requestPath = request.getRequestURI();
+            
+            // 공개 API는 인증 체크 건너뛰기
+            if (isPublicApi(requestPath)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
             
             HttpSession session = request.getSession(false);
             

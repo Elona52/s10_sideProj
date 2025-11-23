@@ -122,9 +122,22 @@ public class AuctionController {
 			@RequestParam(name = "sido", defaultValue = "all", required = false) String sido,
 			@RequestParam(name = "pageNum", defaultValue = "1", required = false) int pageNum) {
 
-		int pageSize = 20;
-		Map<String, Object> data = auctionService.prepareNewItemsPageData(sido, pageNum, pageSize);
-		model.addAllAttributes(data);
+		try {
+			int pageSize = 20;
+			Map<String, Object> data = auctionService.prepareNewItemsPageData(sido, pageNum, pageSize);
+			model.addAllAttributes(data);
+		} catch (Exception e) {
+			// 예외 발생 시에도 빈 목록으로 페이지 표시
+			model.addAttribute("atList", new java.util.ArrayList<>());
+			model.addAttribute("category", "신규물건");
+			model.addAttribute("sido", sido != null ? sido : "all");
+			model.addAttribute("pageNum", pageNum);
+			model.addAttribute("pageCount", 1);
+			model.addAttribute("startPage", 1);
+			model.addAttribute("endPage", 1);
+			model.addAttribute("totalCount", 0);
+			model.addAttribute("error", "데이터를 불러오는 중 오류가 발생했습니다.");
+		}
 
 		return "auction/list";
 	}

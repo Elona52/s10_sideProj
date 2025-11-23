@@ -255,7 +255,7 @@ public class AuctionService {
 					.limit(4)
 					.collect(Collectors.toList());
 			} catch (Exception e) {
-				System.err.println("⚠️ 50% 체감 물건 조회 실패: " + e.getMessage());
+				log.warn("⚠️ 50% 체감 물건 조회 실패: {}", e.getMessage());
 			}
 			
 			// Auction 객체로 변환
@@ -273,7 +273,7 @@ public class AuctionService {
 					}
 				}
 			} catch (Exception e) {
-				System.err.println("⚠️ 용도별 물건 조회 실패: " + e.getMessage());
+				log.warn("⚠️ 용도별 물건 조회 실패: {}", e.getMessage());
 			}
 			data.put("categoryStats", categoryStats);
 			
@@ -302,7 +302,7 @@ public class AuctionService {
 				}
 				scheduleList.addAll(districtMap.values());
 			} catch (Exception e) {
-				System.err.println("⚠️ 마감임박 물건 조회 실패: " + e.getMessage());
+				log.warn("⚠️ 마감임박 물건 조회 실패: {}", e.getMessage());
 			}
 			data.put("scheduleList", scheduleList);
 			
@@ -318,7 +318,7 @@ public class AuctionService {
 					notices.add(notice);
 				}
 			} catch (Exception e) {
-				System.err.println("⚠️ 신규 물건 조회 실패: " + e.getMessage());
+				log.warn("⚠️ 신규 물건 조회 실패: {}", e.getMessage());
 			}
 			data.put("notices", notices);
 			
@@ -328,8 +328,7 @@ public class AuctionService {
 			data.put("totalItems", discount50Items.size());
 			
 		} catch (Exception e) {
-			System.err.println("❌ 메인 페이지 데이터 준비 중 오류: " + e.getMessage());
-			e.printStackTrace();
+			log.error("❌ 메인 페이지 데이터 준비 중 오류: {}", e.getMessage(), e);
 			
 			// 오류 발생 시 빈 데이터로 초기화
 			data.put("discountList", new ArrayList<>());
@@ -380,8 +379,7 @@ public class AuctionService {
 				System.out.println("  - normalizedAddress: " + normalizedAddress);
 			}
 		} catch (Exception e) {
-			System.err.println("❌ API 상세 조회 오류: " + e.getMessage());
-			e.printStackTrace();
+			log.error("❌ API 상세 조회 오류: {}", e.getMessage(), e);
 		}
 		
 		return data;
@@ -416,12 +414,16 @@ public class AuctionService {
 			data.put("totalCount", totalCount);
 			
 		} catch (Exception e) {
-			System.err.println("❌ 경매공고 페이지 오류: " + e.getMessage());
-			e.printStackTrace();
+			log.error("❌ 경매공고 페이지 오류: {}", e.getMessage(), e);
+			// 예외 발생 시에도 페이지네이션 데이터는 필수
+			Map<String, Object> pagination = calculatePagination(0, pageNum, pageSize, 10);
 			data.put("atList", new ArrayList<>());
 			data.put("category", "신규물건");
 			data.put("period", "new");
 			data.put("printType", "new");
+			data.put("sido", sido != null ? sido : "all");
+			data.put("pageNum", pageNum);
+			data.putAll(pagination);
 			data.put("totalCount", 0);
 		}
 		
@@ -545,8 +547,7 @@ public class AuctionService {
 			data.put("dbSavedCount", savedCount);
 			
 		} catch (Exception e) {
-			System.err.println("❌ 50% 체감 물건 페이지 오류: " + e.getMessage());
-			e.printStackTrace();
+			log.error("❌ 50% 체감 물건 페이지 오류: {}", e.getMessage(), e);
 			data.put("atList", new ArrayList<>());
 			data.put("category", "50% 체감 물건");
 			data.put("period", "progress");

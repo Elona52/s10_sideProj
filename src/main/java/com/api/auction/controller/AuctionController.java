@@ -41,7 +41,21 @@ public class AuctionController {
 
 			// 모델에 데이터 추가 (null 체크 및 기본값 설정)
 			model.addAttribute("discountList", mainPageData.getOrDefault("discountList", new java.util.ArrayList<>()));
-			model.addAttribute("categoryStats", mainPageData.getOrDefault("categoryStats", new java.util.HashMap<>()));
+			
+			// categoryStats를 4x3 그리드 형태로 변환 (템플릿에서 안전하게 처리하기 위해)
+			@SuppressWarnings("unchecked")
+			java.util.Map<String, Integer> categoryStatsMap = (java.util.Map<String, Integer>) mainPageData.getOrDefault("categoryStats", new java.util.HashMap<>());
+			java.util.List<java.util.Map.Entry<String, Integer>> categoryStatsList = new java.util.ArrayList<>(categoryStatsMap.entrySet());
+			
+			// 4x3 그리드로 변환 (최대 12개)
+			java.util.List<java.util.Map.Entry<String, Integer>> categoryGrid = new java.util.ArrayList<>();
+			for (int i = 0; i < 12 && i < categoryStatsList.size(); i++) {
+				categoryGrid.add(categoryStatsList.get(i));
+			}
+			
+			model.addAttribute("categoryStats", categoryStatsMap);
+			model.addAttribute("categoryStatsList", categoryGrid);
+			
 			model.addAttribute("scheduleList", mainPageData.getOrDefault("scheduleList", new java.util.ArrayList<>()));
 			model.addAttribute("notices", mainPageData.getOrDefault("notices", new java.util.ArrayList<>()));
 			model.addAttribute("statsRate", mainPageData.getOrDefault("statsRate", "0.0"));
@@ -53,6 +67,7 @@ public class AuctionController {
 			// 예외 발생 시에도 기본값으로 페이지 표시
 			model.addAttribute("discountList", new java.util.ArrayList<>());
 			model.addAttribute("categoryStats", new java.util.HashMap<>());
+			model.addAttribute("categoryStatsList", new java.util.ArrayList<>());
 			model.addAttribute("scheduleList", new java.util.ArrayList<>());
 			model.addAttribute("notices", new java.util.ArrayList<>());
 			model.addAttribute("statsRate", "0.0");

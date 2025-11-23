@@ -83,7 +83,6 @@ public class SecurityConfig {
                         "/api/sido/**",
                         "/api/search",
                         "/api/favorites/check",
-                        "/api/**/public",
                         "/css/**", "/js/**", "/img/**", "/static/**",
                         "/error", "/favicon.ico"
                     ).permitAll()

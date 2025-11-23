@@ -340,12 +340,12 @@
                 <button onclick="location.href='/auctionList'" style="background: none; border: none; color: #999; font-size: 20px; cursor: pointer;">▣</button>
             </div>
             <table style="width: 100%; border-collapse: collapse;">
-                <th:block th:if="${categoryStats != null and !categoryStats.isEmpty()}">
+                <th:block th:if="${categoryStatsList != null and !categoryStatsList.isEmpty()}">
                     <tr th:each="rowNum : ${#numbers.sequence(0, 2)}">
                         <th:block th:each="colNum : ${#numbers.sequence(0, 3)}">
                             <th:block th:with="index=${rowNum * 4 + colNum}">
-                                <td th:if="${index < categoryStats.size()}"
-                                    th:with="entry=${categoryStats.entrySet().toArray()[index]}"
+                                <td th:if="${index < categoryStatsList.size()}"
+                                    th:with="entry=${categoryStatsList.get(index)}"
                                     th:data-category="${entry.key}"
                                     onclick="location.href='/auctionList?category=' + encodeURIComponent(this.getAttribute('data-category'))"
                                     style="padding: 12px 10px; cursor: pointer; text-align: center; font-size: 16px; font-weight: 700; color: #333; border: 1px solid #e0e0e0; background: #fff;"
@@ -353,7 +353,7 @@
                                     onmouseout="this.style.background='#fff'">
                                     <span th:text="${#strings.substringAfter(entry.key, ' / ')}">카테고리</span>
                                 </td>
-                                <td th:if="${index >= categoryStats.size()}" style="padding: 12px 10px; background: #fafafa; border: 1px solid #e0e0e0;"></td>
+                                <td th:if="${index >= categoryStatsList.size()}" style="padding: 12px 10px; background: #fafafa; border: 1px solid #e0e0e0;"></td>
                             </th:block>
                         </th:block>
                     </tr>

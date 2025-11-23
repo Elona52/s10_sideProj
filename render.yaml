@@ -36,3 +36,11 @@ services:
         sync: false
       - key: IAMPORT_CALLBACK_URL
         sync: false
+      # 온비드/캠코 API 설정 (필수)
+      - key: ONBID_API_SERVICE_KEY
+        sync: false
+      - key: ONBID_API_BASE_URL
+        value: https://www.onbid.co.kr/op/nsclbi
+        sync: false
+      - key: KAMCO_API_KEY
+        sync: false

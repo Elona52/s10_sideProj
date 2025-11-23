@@ -44,9 +44,15 @@ public class OnbidApiService {
     private String getServiceKey() {
         // 환경 변수를 우선 사용
         if (serviceKeyFromEnv != null && !serviceKeyFromEnv.trim().isEmpty()) {
+            log.debug("✅ API 키 사용: 환경 변수에서 읽음 (길이: {})", serviceKeyFromEnv.length());
             return serviceKeyFromEnv;
         }
-        return serviceKeyFromProps != null && !serviceKeyFromProps.trim().isEmpty() ? serviceKeyFromProps : "";
+        if (serviceKeyFromProps != null && !serviceKeyFromProps.trim().isEmpty()) {
+            log.debug("✅ API 키 사용: 프로퍼티에서 읽음 (길이: {})", serviceKeyFromProps.length());
+            return serviceKeyFromProps;
+        }
+        log.error("❌ API 키가 설정되지 않았습니다! ONBID_API_SERVICE_KEY 또는 onbid.api.service-key를 설정해주세요.");
+        return "";
     }
     
     @Value("${ONBID_API_BASE_URL:}")
@@ -84,15 +90,22 @@ public class OnbidApiService {
     // 캐시 비활성화 (실시간 데이터 조회를 위해)    // @org.springframework.cache.annotation.Cacheable(value = "onbidItems", key = "'usage_' + #sido + '_' + #pageNo + '_' + #numOfRows")
     public List<Item> getUnifyUsageCltr(String sido, int pageNo, int numOfRows) {
         try {
+            String serviceKey = getServiceKey();
+            if (serviceKey == null || serviceKey.trim().isEmpty()) {
+                log.error("❌ API 키가 없어서 API 호출을 중단합니다.");
+                return new ArrayList<>();
+            }
+            
             String encodedSido = URLEncoder.encode(sido, StandardCharsets.UTF_8);
+            String encodedServiceKey = URLEncoder.encode(serviceKey, StandardCharsets.UTF_8);
             String url = getBaseUrl() + "/getUnifyUsageCltr" +
-                    "?serviceKey=" + getServiceKey() +
+                    "?serviceKey=" + encodedServiceKey +
                     "&SIDO=" + encodedSido +
                     "&pageNo=" + pageNo +
                     "&numOfRows=" + numOfRows;
             
             log.info("🔗 API 호출: 통합용도별물건목록조회");
-            log.info("   URL: {}", url);
+            log.info("   URL: {}", url.replace(encodedServiceKey, "***KEY***")); // 키는 마스킹
             log.info("   페이지: {}, 개수: {}", pageNo, numOfRows);
             
             String xmlResponse = restTemplate.getForObject(new URI(url), String.class);
@@ -118,9 +131,16 @@ public class OnbidApiService {
 
     public List<Item> getUnifyNewCltrList(String sido, int pageNo, int numOfRows) {
         try {
+            String serviceKey = getServiceKey();
+            if (serviceKey == null || serviceKey.trim().isEmpty()) {
+                log.error("❌ API 키가 없어서 API 호출을 중단합니다.");
+                return new ArrayList<>();
+            }
+            
             String encodedSido = URLEncoder.encode(sido, StandardCharsets.UTF_8);
+            String encodedServiceKey = URLEncoder.encode(serviceKey, StandardCharsets.UTF_8);
             String url = getBaseUrl() + "/getUnifyNewCltrList" +
-                    "?serviceKey=" + getServiceKey() +
+                    "?serviceKey=" + encodedServiceKey +
                     "&SIDO=" + encodedSido +
                     "&pageNo=" + pageNo +
                     "&numOfRows=" + numOfRows;
@@ -137,9 +157,16 @@ public class OnbidApiService {
 
     public List<Item> getUnifyDeadlineCltrList(String sido, int pageNo, int numOfRows) {
         try {
+            String serviceKey = getServiceKey();
+            if (serviceKey == null || serviceKey.trim().isEmpty()) {
+                log.error("❌ API 키가 없어서 API 호출을 중단합니다.");
+                return new ArrayList<>();
+            }
+            
             String encodedSido = URLEncoder.encode(sido, StandardCharsets.UTF_8);
+            String encodedServiceKey = URLEncoder.encode(serviceKey, StandardCharsets.UTF_8);
             String url = getBaseUrl() + "/getUnifyDeadlineCltrList" +
-                    "?serviceKey=" + getServiceKey() +
+                    "?serviceKey=" + encodedServiceKey +
                     "&SIDO=" + encodedSido +
                     "&pageNo=" + pageNo +
                     "&numOfRows=" + numOfRows;
@@ -156,9 +183,16 @@ public class OnbidApiService {
 
     public List<Item> getUnifyDegression50PerCltrList(String sido, int pageNo, int numOfRows) {
         try {
+            String serviceKey = getServiceKey();
+            if (serviceKey == null || serviceKey.trim().isEmpty()) {
+                log.error("❌ API 키가 없어서 API 호출을 중단합니다.");
+                return new ArrayList<>();
+            }
+            
             String encodedSido = URLEncoder.encode(sido, StandardCharsets.UTF_8);
+            String encodedServiceKey = URLEncoder.encode(serviceKey, StandardCharsets.UTF_8);
             String url = getBaseUrl() + "/getUnifyDegression50PerCltrList" +
-                    "?serviceKey=" + getServiceKey() +
+                    "?serviceKey=" + encodedServiceKey +
                     "&SIDO=" + encodedSido +
                     "&pageNo=" + pageNo +
                     "&numOfRows=" + numOfRows;
@@ -358,10 +392,18 @@ public class OnbidApiService {
         log.info("🔄 API 호출 중... (타임아웃: 5초)");
         
         try {
+            // API 키 확인
+            String kamcoApiKey = getKamcoApiKey();
+            if (kamcoApiKey == null || kamcoApiKey.trim().isEmpty()) {
+                log.error("❌ 캠코 API 키가 없어서 API 호출을 중단합니다.");
+                return new ArrayList<>();
+            }
+            
             // SIDO 파라미터 추가 (서울특별시)
             String sido = URLEncoder.encode("서울특별시", StandardCharsets.UTF_8);
+            String encodedServiceKey = URLEncoder.encode(kamcoApiKey, StandardCharsets.UTF_8);
             String url = getKamcoApiUrl() +
-                    "?serviceKey=" + getKamcoApiKey() +
+                    "?serviceKey=" + encodedServiceKey +
                     "&numOfRows=" + numOfRows +
                     "&pageNo=" + pageNo +
                     "&SIDO=" + sido;

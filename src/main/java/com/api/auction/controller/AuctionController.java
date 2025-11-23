@@ -39,18 +39,25 @@ public class AuctionController {
 		try {
 			Map<String, Object> mainPageData = auctionService.prepareMainPageData();
 
-			// 모델에 데이터 추가
-			model.addAttribute("discountList", mainPageData.get("discountList"));
-			model.addAttribute("categoryStats", mainPageData.get("categoryStats"));
-			model.addAttribute("scheduleList", mainPageData.get("scheduleList"));
-			model.addAttribute("notices", mainPageData.get("notices"));
-			model.addAttribute("statsRate", mainPageData.get("statsRate"));
-			model.addAttribute("statsLabel", mainPageData.get("statsLabel"));
-			model.addAttribute("totalItems", mainPageData.get("totalItems"));
+			// 모델에 데이터 추가 (null 체크 및 기본값 설정)
+			model.addAttribute("discountList", mainPageData.getOrDefault("discountList", new java.util.ArrayList<>()));
+			model.addAttribute("categoryStats", mainPageData.getOrDefault("categoryStats", new java.util.HashMap<>()));
+			model.addAttribute("scheduleList", mainPageData.getOrDefault("scheduleList", new java.util.ArrayList<>()));
+			model.addAttribute("notices", mainPageData.getOrDefault("notices", new java.util.ArrayList<>()));
+			model.addAttribute("statsRate", mainPageData.getOrDefault("statsRate", "0.0"));
+			model.addAttribute("statsLabel", mainPageData.getOrDefault("statsLabel", "데이터 로딩 중..."));
+			model.addAttribute("totalItems", mainPageData.getOrDefault("totalItems", 0));
 
 			return "main";
 		} catch (Exception e) {
-			// 예외 발생 시에도 기본 페이지는 표시
+			// 예외 발생 시에도 기본값으로 페이지 표시
+			model.addAttribute("discountList", new java.util.ArrayList<>());
+			model.addAttribute("categoryStats", new java.util.HashMap<>());
+			model.addAttribute("scheduleList", new java.util.ArrayList<>());
+			model.addAttribute("notices", new java.util.ArrayList<>());
+			model.addAttribute("statsRate", "0.0");
+			model.addAttribute("statsLabel", "데이터 로딩 중...");
+			model.addAttribute("totalItems", 0);
 			return "main";
 		}
 	}

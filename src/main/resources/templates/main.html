@@ -360,7 +360,10 @@
                 </th:block>
                 <tr th:if="${categoryStats == null or categoryStats.isEmpty()}">
                     <td colspan="4" style="padding: 20px; text-align: center; color: #999; border: 1px solid #e0e0e0; background: #fff;">
-                        데이터를 불러오는 중입니다...
+                        <div style="font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 10px 0;">현재 등록된 물건이 없습니다.</p>
+                            <a href="/auctionList" style="color: #004098; text-decoration: underline; font-weight: 700;">전체 물건 보기</a>
+                        </div>
                     </td>
                 </tr>
             </table>

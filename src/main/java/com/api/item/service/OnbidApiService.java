@@ -44,14 +44,16 @@ public class OnbidApiService {
     private String getServiceKey() {
         // 환경 변수를 우선 사용
         if (serviceKeyFromEnv != null && !serviceKeyFromEnv.trim().isEmpty()) {
-            log.debug("✅ API 키 사용: 환경 변수에서 읽음 (길이: {})", serviceKeyFromEnv.length());
+            log.info("✅ API 키 사용: 환경 변수 ONBID_API_SERVICE_KEY에서 읽음 (길이: {})", serviceKeyFromEnv.length());
             return serviceKeyFromEnv;
         }
         if (serviceKeyFromProps != null && !serviceKeyFromProps.trim().isEmpty()) {
-            log.debug("✅ API 키 사용: 프로퍼티에서 읽음 (길이: {})", serviceKeyFromProps.length());
+            log.info("✅ API 키 사용: 프로퍼티 onbid.api.service-key에서 읽음 (길이: {})", serviceKeyFromProps.length());
             return serviceKeyFromProps;
         }
-        log.error("❌ API 키가 설정되지 않았습니다! ONBID_API_SERVICE_KEY 또는 onbid.api.service-key를 설정해주세요.");
+        log.error("❌ API 키가 설정되지 않았습니다! Render 환경 변수에 ONBID_API_SERVICE_KEY를 설정해주세요.");
+        log.error("   현재 환경 변수 값: ONBID_API_SERVICE_KEY={}", 
+            System.getenv("ONBID_API_SERVICE_KEY") != null ? "설정됨 (길이: " + System.getenv("ONBID_API_SERVICE_KEY").length() + ")" : "NULL");
         return "";
     }
     

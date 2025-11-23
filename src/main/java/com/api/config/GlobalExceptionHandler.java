@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Void> handleNoResourceFoundException(NoResourceFoundException e) {
-        // favicon.ico, common.css 등 정적 리소스 오류는 무시
+        // favicon.ico, common.css 등 정적 리소스 오류는 조용히 무시 (로깅 안 함)
         String resourcePath = e.getResourcePath();
         if (resourcePath != null && (
             resourcePath.contains("favicon.ico") || 
@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
             resourcePath.endsWith(".ico") ||
             resourcePath.endsWith(".css")
         )) {
-            // 정적 리소스 오류는 조용히 무시
+            // 정적 리소스 오류는 조용히 무시 (로깅 없이)
             return ResponseEntity.notFound().build();
         }
         // 다른 리소스 오류는 로깅
@@ -87,7 +87,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleException(Exception e) {
-        // 정적 리소스 오류는 무시
+        // 정적 리소스 오류는 조용히 무시 (로깅 안 함)
         if (e instanceof NoResourceFoundException) {
             NoResourceFoundException nrfe = (NoResourceFoundException) e;
             String resourcePath = nrfe.getResourcePath();
@@ -97,10 +97,12 @@ public class GlobalExceptionHandler {
                 resourcePath.endsWith(".ico") ||
                 resourcePath.endsWith(".css")
             )) {
+                // 로깅 없이 조용히 무시
                 return ResponseEntity.notFound().build();
             }
         }
         
+        // 정적 리소스가 아닌 경우에만 로깅
         log.error("예외 발생: {}", e.getMessage(), e);
         Map<String, Object> response = new HashMap<>();
         response.put("error", "서버 오류가 발생했습니다.");

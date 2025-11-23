@@ -18,6 +18,9 @@ java {
 // @RequestParam 등에서 정상적으로 인식되도록 설정
 tasks.withType(JavaCompile).configureEach {
 	options.compilerArgs += '-parameters'
+	// 디버그 정보 포함 (예외 스택 트레이스에 소스 코드 위치 표시)
+	options.debug = true
+	options.debugOptions.debugLevel = "source,lines,vars"
 }
 
 configurations {

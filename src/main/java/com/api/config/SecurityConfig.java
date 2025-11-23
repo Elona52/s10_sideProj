@@ -77,14 +77,35 @@ public class SecurityConfig {
                         "/swagger-ui/**", "/api-docs/**",
                         "/payment/callback", "/payment/success", "/payment/fail",
                         "/kamco-items/**",
-                        "/api/auction-info/**",  // 공매 정보는 공개
-                        "/api/discount-50", "/api/sido/**", "/api/search", "/api/{id}",  // 캠코 조회는 공개
-                        "/css/**", "/js/**", "/img/**", "/static/**"
+                        // 공개 API 경로 (인증 불필요)
+                        "/api/auction-info/**",
+                        "/api/discount-50",
+                        "/api/sido/**",
+                        "/api/search",
+                        "/api/favorites/check",
+                        "/api/**/public",
+                        "/css/**", "/js/**", "/img/**", "/static/**",
+                        "/error", "/favicon.ico"
                     ).permitAll()
-                    // /api/** 경로는 인증 필요 (기존 세션의 isLogin=true 확인)
+                    // 나머지 /api/** 경로는 인증 필요 (기존 세션의 isLogin=true 확인)
                     .requestMatchers("/api/**").authenticated()
                     // 기타 모든 요청은 인증 필요
                     .anyRequest().authenticated()
+                )
+                // 예외 처리: 인증 실패 시 401, 권한 없음 시 403
+                .exceptionHandling(exceptions -> exceptions
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        log.warn("인증 실패: {} - {}", request.getRequestURI(), authException.getMessage());
+                        response.setStatus(401);
+                        response.setContentType("application/json;charset=UTF-8");
+                        response.getWriter().write("{\"error\":\"인증이 필요합니다.\"}");
+                    })
+                    .accessDeniedHandler((request, response, accessDeniedException) -> {
+                        log.warn("접근 거부: {} - {}", request.getRequestURI(), accessDeniedException.getMessage());
+                        response.setStatus(403);
+                        response.setContentType("application/json;charset=UTF-8");
+                        response.getWriter().write("{\"error\":\"접근 권한이 없습니다.\"}");
+                    })
                 )
                 // 기존 로그인 로직 사용 (MemberController의 /login)
                 .formLogin(form -> form.disable())

@@ -473,13 +473,13 @@ public class AuctionService {
 			data.put("totalCount", totalCount);
 			
 		} catch (Exception e) {
-			System.err.println("❌ 경매 목록 조회 오류: " + e.getMessage());
-			e.printStackTrace();
+			log.error("❌ 경매 목록 조회 오류: {}", e.getMessage(), e);
 			data.put("atList", new ArrayList<>());
 			data.put("category", category);
 			data.put("period", period);
 			data.put("printType", printType);
 			data.put("totalCount", 0);
+			data.put("error", "데이터를 불러오는 중 오류가 발생했습니다.");
 		}
 		
 		return data;

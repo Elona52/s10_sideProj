@@ -116,7 +116,7 @@
             <div style="display: flex; gap: 20px;">
                 <img th:src="@{/upload/{img}(img=${auction.img})}" th:alt="${auction.name}"
                      style="width: 200px; height: 150px; object-fit: cover; border-radius: 8px;"
-                     onerror="this.src='/img/auto-3298890_1280.jpg'">
+                     th:onerror="'this.src=\'' + @{/img/auto-3298890_1280.jpg} + '\''">
                 <div style="flex: 1;">
                     <h4 style="font-size: 24px; font-weight: bold; margin-bottom: 10px;" th:text="${auction.name}">상품명</h4>
                     <p style="color: #666;">판매자: <span th:text="${auction.id}">판매자</span></p>

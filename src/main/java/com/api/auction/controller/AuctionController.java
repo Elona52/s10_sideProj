@@ -36,22 +36,23 @@ public class AuctionController {
 
 	@RequestMapping(value = "/main")
 	public String mainPage(Model model) {
-		System.out.println("\n=== 메인 페이지 데이터 로딩 시작 (DB 데이터 사용) ===");
+		try {
+			Map<String, Object> mainPageData = auctionService.prepareMainPageData();
 
-		Map<String, Object> mainPageData = auctionService.prepareMainPageData();
+			// 모델에 데이터 추가
+			model.addAttribute("discountList", mainPageData.get("discountList"));
+			model.addAttribute("categoryStats", mainPageData.get("categoryStats"));
+			model.addAttribute("scheduleList", mainPageData.get("scheduleList"));
+			model.addAttribute("notices", mainPageData.get("notices"));
+			model.addAttribute("statsRate", mainPageData.get("statsRate"));
+			model.addAttribute("statsLabel", mainPageData.get("statsLabel"));
+			model.addAttribute("totalItems", mainPageData.get("totalItems"));
 
-		// 모델에 데이터 추가
-		model.addAttribute("discountList", mainPageData.get("discountList"));
-		model.addAttribute("categoryStats", mainPageData.get("categoryStats"));
-		model.addAttribute("scheduleList", mainPageData.get("scheduleList"));
-		model.addAttribute("notices", mainPageData.get("notices"));
-		model.addAttribute("statsRate", mainPageData.get("statsRate"));
-		model.addAttribute("statsLabel", mainPageData.get("statsLabel"));
-		model.addAttribute("totalItems", mainPageData.get("totalItems"));
-
-		System.out.println("✅ 메인 페이지 데이터 로딩 완료");
-
-		return "main";
+			return "main";
+		} catch (Exception e) {
+			// 예외 발생 시에도 기본 페이지는 표시
+			return "main";
+		}
 	}
 
 	/**
@@ -137,10 +138,18 @@ public class AuctionController {
 			@RequestParam(name = "sido", defaultValue = "서울특별시", required = false) String sido,
 			@RequestParam(name = "pageNum", defaultValue = "1", required = false) int pageNum) {
 
-		int pageSize = 20;
-		Map<String, Object> data = auctionService.prepareAuctionListPageData(category, period, printType, sido, pageNum,
-				pageSize);
-		model.addAllAttributes(data);
+		try {
+			int pageSize = 20;
+			Map<String, Object> data = auctionService.prepareAuctionListPageData(category, period, printType, sido, pageNum,
+					pageSize);
+			model.addAllAttributes(data);
+		} catch (Exception e) {
+			// 예외 발생 시에도 빈 목록으로 페이지 표시
+			model.addAttribute("atList", new java.util.ArrayList<>());
+			model.addAttribute("category", category);
+			model.addAttribute("totalCount", 0);
+			model.addAttribute("error", "데이터를 불러오는 중 오류가 발생했습니다.");
+		}
 
 		return "auction/list";
 	}
